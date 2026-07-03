@@ -8,8 +8,8 @@
     "deploy": "wrangler deploy",
     "build": "wrangler deploy --dry-run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
-    "lint": "eslint src --ext .ts"
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint -c ../../eslint.config.js src test"
   },
   "dependencies": {
     "@github-pet/core": "workspace:*",
