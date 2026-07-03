@@ -1,0 +1,7 @@
+name = "github-pet-api"
+main = "src/index.ts"
+compatibility_date = "2025-06-01"
+
+[vars]
+CACHE_TTL_SECONDS = "1800"
+WIDGET_BASE_URL = "http://localhost:8787"
