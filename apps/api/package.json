@@ -12,8 +12,12 @@
     "lint": "eslint -c ../../eslint.config.js src test"
   },
   "dependencies": {
+    "@github-pet/cache": "workspace:*",
     "@github-pet/core": "workspace:*",
+    "@github-pet/github": "workspace:*",
     "@github-pet/renderer": "workspace:*",
+    "@github-pet/speech": "workspace:*",
+    "@github-pet/state": "workspace:*",
     "hono": "^4.6.0"
   }
 }

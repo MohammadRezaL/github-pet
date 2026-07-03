@@ -1,3 +1,4 @@
+import type { GitHubActivitySummary } from "./activity.types";
 import type { Emotion } from "./emotion.types";
 import type { Pet } from "./pet.types";
 import type { ThemeName } from "./theme.types";
@@ -16,4 +17,6 @@ export interface WidgetOptions {
 export interface RenderWidgetInput {
   options: WidgetOptions;
   generatedAt: Date;
+  activity?: GitHubActivitySummary;
+  cacheStatus?: "hit" | "miss" | "disabled";
 }
