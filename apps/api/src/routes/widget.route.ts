@@ -1,6 +1,12 @@
-import { getOrSetCached, githubActivityCacheKey, parseCacheTtlSeconds, CACHE_TTL } from "@github-pet/cache";
+import {
+  CACHE_TTL,
+  getOrSetCached,
+  githubActivityCacheKey,
+  parseCacheTtlSeconds,
+} from "@github-pet/cache";
 import { getGitHubActivity } from "@github-pet/github";
 import { renderWidget } from "@github-pet/renderer";
+import { resolvePetState } from "@github-pet/state";
 import { Hono } from "hono";
 import type { AppBindings } from "../runtime/runtime.types";
 import { createRequestContext } from "../runtime/request-context";
@@ -9,13 +15,16 @@ import { parseWidgetOptions } from "../utils/validators";
 
 export const widgetRoute = new Hono<AppBindings>();
 
-async function renderWidgetForRequest(c: Parameters<Parameters<typeof widgetRoute.get>[1]>[0], username?: string) {
+type WidgetRouteContext = Parameters<Parameters<typeof widgetRoute.get>[1]>[0];
+
+async function renderWidgetForRequest(c: WidgetRouteContext, username?: string) {
   const options = parseWidgetOptions({
     ...c.req.query(),
     username: username ?? c.req.query("username"),
   });
 
   const context = createRequestContext(c.env);
+
   const ttlSeconds = parseCacheTtlSeconds(
     c.env.CACHE_TTL_SECONDS,
     CACHE_TTL.githubActivitySeconds,
@@ -32,8 +41,13 @@ async function renderWidgetForRequest(c: Parameters<Parameters<typeof widgetRout
       }),
   );
 
+  const state = resolvePetState(cachedActivity.value);
+
   const svg = renderWidget({
-    options,
+    options: {
+      ...options,
+      emotion: options.emotion ?? state.emotion,
+    },
     generatedAt: new Date(),
     activity: cachedActivity.value,
     cacheStatus: cachedActivity.cacheStatus,

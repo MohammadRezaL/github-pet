@@ -1,4 +1,4 @@
-import type { RenderWidgetInput } from "@github-pet/core";
+import type { Emotion, RenderWidgetInput } from "@github-pet/core";
 import { renderBackground } from "./components/background.component";
 import { renderPet } from "./components/pet.component";
 import { renderSpeechBubble } from "./components/speech-bubble.component";
@@ -8,31 +8,44 @@ import { renderVisitorCounter } from "./components/visitor-counter.component";
 import { escapeSvgAttribute } from "./svg-safe";
 import { getWidgetLayoutBox } from "./widget-layout";
 
-function resolveBootstrapMessage(input: RenderWidgetInput): string {
-  const activity = input.activity;
-
-  if (!activity) {
-    return "Feed me with commits!";
+function messageForEmotion(emotion: Emotion): string {
+  switch (emotion) {
+    case "crying":
+      return "I miss my human...";
+    case "lonely":
+      return "I'm getting lonely...";
+    case "sad":
+      return "You haven't been here in a while.";
+    case "hungry":
+      return "Feed me with commits!";
+    case "excited":
+      return "So many commits! I'm excited!";
+    case "playing":
+      return "Your streak keeps me playful!";
+    case "happy":
+      return "Thanks for feeding me!";
+    case "sleeping":
+      return "Zzz... waiting for activity.";
+    case "angry":
+      return "Hey! Don't abandon me!";
+    case "waving":
+      return "Hi visitor! Welcome!";
+    case "eating":
+      return "Nom nom... fresh commits!";
+    case "waiting":
+    default:
+      return "I've been waiting for you.";
   }
+}
 
-  if (activity.commitsLast7Days >= 10) {
-    return "So many commits! I'm excited!";
-  }
-
-  if (activity.currentStreakDays >= 7) {
-    return "Your streak keeps me happy!";
-  }
-
-  if (activity.commitsLast7Days === 0) {
-    return "I miss your commits...";
-  }
-
-  return "Thanks for feeding me!";
+function resolveWidgetEmotion(input: RenderWidgetInput): Emotion {
+  return input.options.emotion ?? "waiting";
 }
 
 export function renderWidget(input: RenderWidgetInput): string {
   const box = getWidgetLayoutBox();
-  const message = resolveBootstrapMessage(input);
+  const emotion = resolveWidgetEmotion(input);
+  const message = messageForEmotion(emotion);
   const safeUsername = escapeSvgAttribute(input.options.username);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
