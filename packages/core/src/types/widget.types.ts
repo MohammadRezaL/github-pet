@@ -14,9 +14,16 @@ export interface WidgetOptions {
   hideStats: boolean;
 }
 
+export interface WidgetSpeech {
+  text: string;
+  priority: number;
+  tone: "positive" | "neutral" | "sad" | "urgent" | "playful";
+}
+
 export interface RenderWidgetInput {
   options: WidgetOptions;
   generatedAt: Date;
   activity?: GitHubActivitySummary;
+  speech?: WidgetSpeech;
   cacheStatus?: "hit" | "miss" | "disabled";
 }

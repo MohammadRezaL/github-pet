@@ -6,6 +6,7 @@ import {
 } from "@github-pet/cache";
 import { getGitHubActivity } from "@github-pet/github";
 import { renderWidget } from "@github-pet/renderer";
+import { createSpeech } from "@github-pet/speech";
 import { resolvePetState } from "@github-pet/state";
 import { Hono } from "hono";
 import type { AppBindings } from "../runtime/runtime.types";
@@ -42,14 +43,24 @@ async function renderWidgetForRequest(c: WidgetRouteContext, username?: string) 
   );
 
   const state = resolvePetState(cachedActivity.value);
+  const emotion = options.emotion ?? state.emotion;
+
+  const speech = createSpeech({
+    username: options.username,
+    emotion,
+    activity: cachedActivity.value,
+    matchedRule: state.matchedRule,
+    milestoneLabel: state.milestone.label,
+  });
 
   const svg = renderWidget({
     options: {
       ...options,
-      emotion: options.emotion ?? state.emotion,
+      emotion,
     },
     generatedAt: new Date(),
     activity: cachedActivity.value,
+    speech,
     cacheStatus: cachedActivity.cacheStatus,
   });
 

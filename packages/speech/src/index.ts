@@ -1,1 +1,3 @@
-export const packageName = "@github-pet/speech";
+export * from "./speech-engine";
+export * from "./speech-rules";
+export * from "./speech.types";
