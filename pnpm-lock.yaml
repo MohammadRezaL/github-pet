@@ -59,9 +59,15 @@ importers:
       '@github-pet/speech':
         specifier: workspace:*
         version: link:../../packages/speech
+      '@github-pet/sprites':
+        specifier: workspace:*
+        version: link:../../packages/sprites
       '@github-pet/state':
         specifier: workspace:*
         version: link:../../packages/state
+      '@github-pet/theme':
+        specifier: workspace:*
+        version: link:../../packages/theme
       hono:
         specifier: ^4.6.0
         version: 4.12.27
@@ -79,6 +85,12 @@ importers:
       '@github-pet/core':
         specifier: workspace:*
         version: link:../core
+      '@github-pet/sprites':
+        specifier: workspace:*
+        version: link:../sprites
+      '@github-pet/theme':
+        specifier: workspace:*
+        version: link:../theme
 
   packages/shared: {}
 

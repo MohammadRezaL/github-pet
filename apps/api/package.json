@@ -18,6 +18,8 @@
     "@github-pet/renderer": "workspace:*",
     "@github-pet/speech": "workspace:*",
     "@github-pet/state": "workspace:*",
-    "hono": "^4.6.0"
+    "hono": "^4.6.0",
+    "@github-pet/sprites": "workspace:*",
+    "@github-pet/theme": "workspace:*"
   }
 }

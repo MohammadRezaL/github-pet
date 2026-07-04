@@ -4,30 +4,52 @@ import {
   githubActivityCacheKey,
   parseCacheTtlSeconds,
 } from "@github-pet/cache";
-import { getGitHubActivity } from "@github-pet/github";
+import { getGitHubActivity, type GitHubServiceConfig } from "@github-pet/github";
 import { renderWidget } from "@github-pet/renderer";
 import { createSpeech } from "@github-pet/speech";
 import { resolvePetState } from "@github-pet/state";
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import type { AppBindings } from "../runtime/runtime.types";
+import type { CloudflareEnv } from "../runtime/cloudflare.env";
 import { createRequestContext } from "../runtime/request-context";
 import { svgResponse } from "../utils/response";
 import { parseWidgetOptions } from "../utils/validators";
 
 export const widgetRoute = new Hono<AppBindings>();
 
-type WidgetRouteContext = Parameters<Parameters<typeof widgetRoute.get>[1]>[0];
+type WidgetRouteContext<Path extends string = string> = Context<AppBindings, Path>;
 
-async function renderWidgetForRequest(c: WidgetRouteContext, username?: string) {
+function getSafeEnv<Path extends string>(c: WidgetRouteContext<Path>): CloudflareEnv {
+  return (c.env ?? {}) as CloudflareEnv;
+}
+
+function createGitHubConfig(env: CloudflareEnv): GitHubServiceConfig {
+  const config: GitHubServiceConfig = {
+    userAgent: "github-pet",
+  };
+
+  if (env.GITHUB_TOKEN) {
+    config.token = env.GITHUB_TOKEN;
+  }
+
+  return config;
+}
+
+async function renderWidgetForRequest<Path extends string>(
+  c: WidgetRouteContext<Path>,
+  username?: string,
+): Promise<Response> {
+  const env = getSafeEnv(c);
+
   const options = parseWidgetOptions({
     ...c.req.query(),
     username: username ?? c.req.query("username"),
   });
 
-  const context = createRequestContext(c.env);
+  const context = createRequestContext(env);
 
   const ttlSeconds = parseCacheTtlSeconds(
-    c.env.CACHE_TTL_SECONDS,
+    env.CACHE_TTL_SECONDS,
     CACHE_TTL.githubActivitySeconds,
   );
 
@@ -35,11 +57,7 @@ async function renderWidgetForRequest(c: WidgetRouteContext, username?: string) 
     context.cache,
     githubActivityCacheKey(options.username),
     ttlSeconds,
-    () =>
-      getGitHubActivity(options.username, {
-        token: c.env.GITHUB_TOKEN,
-        userAgent: "github-pet",
-      }),
+    () => getGitHubActivity(options.username, createGitHubConfig(env)),
   );
 
   const state = resolvePetState(cachedActivity.value);

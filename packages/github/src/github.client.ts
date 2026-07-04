@@ -50,11 +50,19 @@ export async function githubRestRequest<T>(options: GitHubRequestOptions): Promi
 export function createGitHubClient(config: GitHubServiceConfig) {
   return {
     get<T>(path: string): Promise<T> {
-      return githubRestRequest<T>({
+      const options: GitHubRequestOptions = {
         path,
-        token: config.token,
-        userAgent: config.userAgent,
-      });
+      };
+
+      if (config.token) {
+        options.token = config.token;
+      }
+
+      if (config.userAgent) {
+        options.userAgent = config.userAgent;
+      }
+
+      return githubRestRequest<T>(options);
     },
   };
 }

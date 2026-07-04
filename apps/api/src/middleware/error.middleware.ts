@@ -2,38 +2,55 @@ import type { ErrorHandler } from "hono";
 import { GitHubPetError } from "@github-pet/core";
 import { HttpError } from "../utils/http-error";
 
-export const errorHandler: ErrorHandler = (error, c) => {
+interface ErrorPayload {
+  error: {
+    code: string;
+    message: string;
+  };
+}
+
+function errorResponse(payload: ErrorPayload, status: number): Response {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-Content-Type-Options": "nosniff",
+    },
+  });
+}
+
+export const errorHandler: ErrorHandler = (error) => {
   if (error instanceof GitHubPetError) {
-    return c.json(
+    return errorResponse(
       {
         error: {
           code: error.code,
-          message: error.message
-        }
+          message: error.message,
+        },
       },
-      error.statusCode
+      error.statusCode,
     );
   }
 
   if (error instanceof HttpError) {
-    return c.json(
+    return errorResponse(
       {
         error: {
           code: "HTTP_ERROR",
-          message: error.message
-        }
+          message: error.message,
+        },
       },
-      error.statusCode
+      error.statusCode,
     );
   }
 
-  return c.json(
+  return errorResponse(
     {
       error: {
         code: "INTERNAL_SERVER_ERROR",
-        message: "Unexpected server error."
-      }
+        message: error instanceof Error ? error.message : "Unexpected server error.",
+      },
     },
-    500
+    500,
   );
 };

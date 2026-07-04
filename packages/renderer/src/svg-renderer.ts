@@ -1,4 +1,4 @@
-import type { RenderWidgetInput } from "@github-pet/core";
+import type { Emotion, RenderWidgetInput } from "@github-pet/core";
 import { renderBackground } from "./components/background.component";
 import { renderPet } from "./components/pet.component";
 import { renderSpeechBubble } from "./components/speech-bubble.component";
@@ -8,10 +8,15 @@ import { renderVisitorCounter } from "./components/visitor-counter.component";
 import { escapeSvgAttribute } from "./svg-safe";
 import { getWidgetLayoutBox } from "./widget-layout";
 
+function resolveEmotion(input: RenderWidgetInput): Emotion {
+  return input.options.emotion ?? "waiting";
+}
+
 export function renderWidget(input: RenderWidgetInput): string {
   const box = getWidgetLayoutBox();
   const message = input.speech?.text ?? "I've been waiting for you.";
   const safeUsername = escapeSvgAttribute(input.options.username);
+  const emotion = resolveEmotion(input);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg
@@ -25,7 +30,10 @@ export function renderWidget(input: RenderWidgetInput): string {
   <title>GitHub Pet for ${safeUsername}</title>
   <desc>An animated pixel-art pet widget generated from GitHub activity.</desc>
   ${renderBackground()}
-  ${renderPet()}
+  ${renderPet({
+    pet: input.options.pet,
+    emotion,
+  })}
   ${renderSpeechBubble(message)}
   ${input.options.hideStats ? "" : renderStatsPanel(input.options.username, input.activity)}
   ${renderVisitorCounter()}

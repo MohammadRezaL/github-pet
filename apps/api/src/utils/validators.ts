@@ -50,12 +50,17 @@ export function parseWidgetOptions(query: Record<string, string | undefined>): W
     throw new GitHubPetError("Unsupported emotion.", ERROR_CODES.INVALID_EMOTION, 400);
   }
 
-  return {
+  const options: WidgetOptions = {
     username,
     pet,
     theme,
     layout: DEFAULT_WIDGET_OPTIONS.layout,
-    emotion,
-    hideStats: readBoolean(query.hide_stats, DEFAULT_WIDGET_OPTIONS.hideStats)
+    hideStats: readBoolean(query.hide_stats, DEFAULT_WIDGET_OPTIONS.hideStats),
   };
+
+  if (emotion !== undefined) {
+    options.emotion = emotion;
+  }
+
+  return options;
 }

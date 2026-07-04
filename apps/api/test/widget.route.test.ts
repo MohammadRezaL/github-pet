@@ -1,6 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { app } from "../src/app";
 
+interface ErrorBody {
+  error: {
+    code: string;
+    message: string;
+  };
+}
+
 describe("widget route", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -12,7 +19,7 @@ describe("widget route", () => {
     vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
       const url = String(input);
 
-      if (url.includes("/users/octocat/events/public")) {
+      if (url.includes("/users/test-user/events/public")) {
         return new Response(
           JSON.stringify([
             {
@@ -34,10 +41,10 @@ describe("widget route", () => {
         );
       }
 
-      if (url.includes("/users/octocat")) {
+      if (url.includes("/users/test-user")) {
         return new Response(
           JSON.stringify({
-            login: "octocat",
+            login: "test-user",
             followers: 100,
             public_repos: 10,
             created_at: "2011-01-25T18:44:36Z",
@@ -50,17 +57,15 @@ describe("widget route", () => {
       return new Response("not found", { status: 404 });
     });
 
-    const res = await app.request("/api?username=octocat");
+    const res = await app.request("/api?username=test-user&emotion=happy");
+    const bodyText = await res.text();
 
-    expect(res.status).toBe(200);
+    expect(bodyText).toContain("<svg");
+    expect(res.status, bodyText).toBe(200);
     expect(res.headers.get("content-type")).toContain("image/svg+xml");
-
-    const svg = await res.text();
-
-    expect(svg).toContain("<svg");
-    expect(svg).toContain("GitHub Pet for octocat");
-    expect(svg).toContain("followers:");
-    expect(svg).toContain("100");
+    expect(bodyText).toContain("GitHub Pet for test-user");
+    expect(bodyText).toContain("followers:");
+    expect(bodyText).toContain("100");
   });
 
   it("rejects missing username", async () => {
@@ -68,7 +73,7 @@ describe("widget route", () => {
 
     expect(res.status).toBe(400);
 
-    const body = await res.json();
+    const body = (await res.json()) as ErrorBody;
 
     expect(body.error.code).toBe("INVALID_USERNAME");
   });
@@ -78,7 +83,7 @@ describe("widget route", () => {
 
     expect(res.status).toBe(400);
 
-    const body = await res.json();
+    const body = (await res.json()) as ErrorBody;
 
     expect(body.error.code).toBe("INVALID_PET");
   });

@@ -18,7 +18,9 @@
     "lint": "eslint -c ../../eslint.config.js src test"
   },
   "dependencies": {
-    "@github-pet/core": "workspace:*"
+    "@github-pet/core": "workspace:*",
+    "@github-pet/sprites": "workspace:*",
+    "@github-pet/theme": "workspace:*"
   },
   "main": "./src/index.ts",
   "module": "./src/index.ts"

@@ -1,3 +1,47 @@
 {
-  "extends": "../../tooling/tsconfig/package.json"
+  "extends": "../../tooling/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "paths": {
+      "@github-pet/core": [
+        "packages/core/src/index.ts"
+      ],
+      "@github-pet/cache": [
+        "packages/cache/src/index.ts"
+      ],
+      "@github-pet/github": [
+        "packages/github/src/index.ts"
+      ],
+      "@github-pet/renderer": [
+        "packages/renderer/src/index.ts"
+      ],
+      "@github-pet/speech": [
+        "packages/speech/src/index.ts"
+      ],
+      "@github-pet/sprites": [
+        "packages/sprites/src/index.ts"
+      ],
+      "@github-pet/state": [
+        "packages/state/src/index.ts"
+      ],
+      "@github-pet/theme": [
+        "packages/theme/src/index.ts"
+      ],
+      "@github-pet/animation": [
+        "packages/animation/src/index.ts"
+      ],
+      "@github-pet/shared": [
+        "packages/shared/src/index.ts"
+      ]
+    },
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }
